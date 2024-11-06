@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 import { UserService } from './user.service';
 import { User } from 'src/models/user.model';
 import { CreateUserDto } from 'src/models/create-user.dto';
 
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, ParseUUIDPipe } from '@nestjs/common';
 
 @Controller('user')
 export class UserController {
@@ -13,6 +13,11 @@ export class UserController {
   @Get()
   findAll(): User[] {
     return this.userService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseUUIDPipe) id: string): User {
+    return this.userService.findOne(id);
   }
 
   @Post()
