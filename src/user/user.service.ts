@@ -21,7 +21,7 @@ export class UserService {
     return this.users;
   }
 
-  createUser(createUserDto: CreateUserDto): User {
+  createUser(createUserDto): User {
     const newUser: User = {
       id: uuidv4(),
       login: createUserDto.login,
