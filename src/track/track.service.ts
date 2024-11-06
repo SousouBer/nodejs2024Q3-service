@@ -3,6 +3,7 @@ import { Track } from 'src/models/track.model';
 import { CreateTrackDto } from './dto/create-track.dto';
 
 import { v4 as uuidv4 } from 'uuid';
+import { UpdateTrackDto } from './dto/update-track.dto';
 
 @Injectable()
 export class TrackService {
@@ -34,5 +35,15 @@ export class TrackService {
     this.tracks.push(newTrack);
 
     return newTrack;
+  }
+
+  updateTrack(id: string, updateTrackDto: UpdateTrackDto): Track {
+    const track = this.getTrack(id);
+
+    this.tracks = this.tracks.map((track) =>
+      track.id === id ? { ...track, ...updateTrackDto } : track,
+    );
+
+    return { ...track, ...updateTrackDto };
   }
 }
