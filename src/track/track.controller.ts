@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   ParseUUIDPipe,
   Post,
@@ -38,5 +40,11 @@ export class TrackController {
     @Body(ValidationPipe) updateTrackDto: UpdateTrackDto,
   ): Track {
     return this.trackService.updateTrack(id, updateTrackDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  deleteTrack(@Param('id', ParseUUIDPipe) id: string): void {
+    this.trackService.deleteTrack(id);
   }
 }

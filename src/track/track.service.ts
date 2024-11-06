@@ -46,4 +46,10 @@ export class TrackService {
 
     return { ...track, ...updateTrackDto };
   }
+
+  deleteTrack(id: string): void {
+    this.getTrack(id);
+
+    this.tracks = this.tracks.filter((user) => user.id !== id);
+  }
 }
