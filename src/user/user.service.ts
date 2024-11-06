@@ -65,4 +65,10 @@ export class UserService {
 
     return { ...user, password: updatePasswordDto.newPassword };
   }
+
+  deleteUser(id: string): void {
+    this.findOne(id);
+
+    this.users = this.users.filter((user) => user.id !== id);
+  }
 }
