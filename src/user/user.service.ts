@@ -1,8 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
 import { CreateUserDto } from 'src/models/create-user.dto';
 import { User } from 'src/models/user.model';
+import { UpdatePasswordDto } from 'src/models/update-password.dto';
 
 @Injectable()
 export class UserService {
@@ -43,5 +48,21 @@ export class UserService {
 
     this.users.push(newUser);
     return newUser;
+  }
+
+  updatePassword(id: string, updatePasswordDto: UpdatePasswordDto): User {
+    const user = this.findOne(id);
+
+    if (user.password !== updatePasswordDto.oldPassword) {
+      throw new ForbiddenException('Old password is incorrect.');
+    }
+
+    this.users = this.users.map((user) =>
+      user.id === id
+        ? { ...user, password: updatePasswordDto.newPassword }
+        : user,
+    );
+
+    return { ...user, password: updatePasswordDto.newPassword };
   }
 }
