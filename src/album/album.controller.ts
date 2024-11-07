@@ -14,10 +14,14 @@ import { AlbumService } from './album.service';
 import { Album } from 'src/models/album.model';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
+import { CleanupService } from 'src/helpers/cleanup/cleanup.service';
 
 @Controller('album')
 export class AlbumController {
-  constructor(private albumService: AlbumService) {}
+  constructor(
+    private albumService: AlbumService,
+    private cleanupService: CleanupService,
+  ) {}
 
   @Get()
   getAllAlbums(): Album[] {
@@ -46,5 +50,6 @@ export class AlbumController {
   @HttpCode(204)
   deleteAlbum(@Param('id', ParseUUIDPipe) id: string): void {
     this.albumService.deleteAlbum(id);
+    this.cleanupService.cleanupAlbum(id);
   }
 }

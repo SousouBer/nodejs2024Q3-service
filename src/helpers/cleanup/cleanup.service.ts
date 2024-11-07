@@ -15,4 +15,8 @@ export class CleanupService {
     this.albumService.deleteArtist(id);
     this.trackService.deleteArtist(id);
   }
+
+  cleanupAlbum(id: string): void {
+    this.trackService.deleteAlbum(id);
+  }
 }
