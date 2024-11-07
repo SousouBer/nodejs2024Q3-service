@@ -11,32 +11,25 @@ import { UpdatePasswordDto } from 'src/models/update-password.dto';
 
 @Injectable()
 export class UserService {
-  private users: User[] = [
-    {
-      id: 'string',
-      login: 'string',
-      password: 'string',
-      version: 5,
-      createdAt: 10,
-      updatedAt: 10,
-    },
-  ];
+  private users: User[] = [];
 
-  findAll(): User[] {
-    return this.users;
+  findAll(): Partial<User>[] {
+    return this.users.map((user) => {
+      return this.removePasswordFromUser(user);
+    });
   }
 
-  findOne(id: string): User {
+  findOne(id: string): Partial<User> {
     const user = this.users.find((user) => user.id === id);
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} does not exist`);
     }
 
-    return user;
+    return this.removePasswordFromUser(user);
   }
 
-  createUser(createUserDto: CreateUserDto): User {
+  createUser(createUserDto: CreateUserDto): Partial<User> {
     const newUser: User = {
       id: uuidv4(),
       login: createUserDto.login,
@@ -47,10 +40,14 @@ export class UserService {
     };
 
     this.users.push(newUser);
-    return newUser;
+
+    return this.removePasswordFromUser(newUser);
   }
 
-  updatePassword(id: string, updatePasswordDto: UpdatePasswordDto): User {
+  updatePassword(
+    id: string,
+    updatePasswordDto: UpdatePasswordDto,
+  ): Partial<User> {
     const user = this.findOne(id);
 
     if (user.password !== updatePasswordDto.oldPassword) {
@@ -63,12 +60,19 @@ export class UserService {
         : user,
     );
 
-    return { ...user, password: updatePasswordDto.newPassword };
+    return this.removePasswordFromUser(user);
   }
 
   deleteUser(id: string): void {
     this.findOne(id);
 
     this.users = this.users.filter((user) => user.id !== id);
+  }
+
+  private removePasswordFromUser(user: Partial<User>): Partial<User> {
+    const userWithoutPassword = { ...user };
+    delete userWithoutPassword.password;
+
+    return userWithoutPassword;
   }
 }
