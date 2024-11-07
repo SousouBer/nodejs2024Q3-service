@@ -56,4 +56,37 @@ export class FavsService {
       (track) => track.id !== id,
     );
   }
+
+  addAlbumToFavs(id: string) {
+    try {
+      const album = this.albumService.getAlbum(id);
+
+      if (this.favourites.albums.includes(album)) {
+        throw new EntityAlreadyInFavoritesException(id, 'album');
+      }
+
+      this.favourites.albums.push(album);
+
+      return 'Album added Successfully!';
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotInFavoritesException(id, 'album');
+      }
+      throw error;
+    }
+  }
+
+  deleteAlbumFromFavs(id: string): void {
+    const album = this.favourites.albums.find((album) => album.id === id);
+
+    if (!album) {
+      throw new NotFoundException(
+        `Album with ID ${id} is not in the favourites.`,
+      );
+    }
+
+    this.favourites.albums = this.favourites.albums.filter(
+      (album) => album.id !== id,
+    );
+  }
 }
