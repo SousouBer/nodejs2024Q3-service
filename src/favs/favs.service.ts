@@ -42,4 +42,18 @@ export class FavsService {
       throw error;
     }
   }
+
+  deleteTrackFromFavs(id: string): void {
+    const track = this.favourites.tracks.find((track) => track.id === id);
+
+    if (!track) {
+      throw new NotFoundException(
+        `Track with ID ${id} is not in the favourites.`,
+      );
+    }
+
+    this.favourites.tracks = this.favourites.tracks.filter(
+      (track) => track.id !== id,
+    );
+  }
 }
