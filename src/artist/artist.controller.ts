@@ -14,10 +14,14 @@ import { ArtistService } from './artist.service';
 import { Artist } from 'src/models/artist.model';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
+import { CleanupService } from 'src/helpers/cleanup/cleanup.service';
 
 @Controller('artist')
 export class ArtistController {
-  constructor(private artistService: ArtistService) {}
+  constructor(
+    private artistService: ArtistService,
+    private cleanupService: CleanupService,
+  ) {}
 
   @Get()
   getAllArtists(): Artist[] {
@@ -46,5 +50,6 @@ export class ArtistController {
   @HttpCode(204)
   deleteArtist(@Param('id', ParseUUIDPipe) id: string): void {
     this.artistService.deleteArtist(id);
+    this.cleanupService.cleanupArtist(id);
   }
 }

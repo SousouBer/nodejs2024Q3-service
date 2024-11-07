@@ -51,4 +51,12 @@ export class AlbumService {
 
     this.albums = this.albums.filter((album) => album.id !== id);
   }
+
+  deleteArtist(artistId: string): void {
+    this.albums.forEach((album) => {
+      if (album.artistId === artistId) {
+        album.artistId = null;
+      }
+    });
+  }
 }

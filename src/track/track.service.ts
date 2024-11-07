@@ -52,4 +52,12 @@ export class TrackService {
 
     this.tracks = this.tracks.filter((user) => user.id !== id);
   }
+
+  deleteArtist(id: string): void {
+    this.tracks.forEach((track) => {
+      if (track.artistId === id) {
+        track.artistId = null;
+      }
+    });
+  }
 }

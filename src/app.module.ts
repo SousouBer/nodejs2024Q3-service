@@ -11,10 +11,11 @@ import { AlbumController } from './album/album.controller';
 import { AlbumService } from './album/album.service';
 import { FavsController } from './favs/favs.controller';
 import { FavsService } from './favs/favs.service';
+import { CleanupService } from './helpers/cleanup/cleanup.service';
 
 @Module({
   imports: [],
   controllers: [AppController, UserController, TrackController, ArtistController, AlbumController, FavsController],
-  providers: [AppService, UserService, TrackService, ArtistService, AlbumService, FavsService],
+  providers: [AppService, UserService, TrackService, ArtistService, AlbumService, FavsService, CleanupService],
 })
 export class AppModule {}
