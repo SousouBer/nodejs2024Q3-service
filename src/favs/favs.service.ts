@@ -9,6 +9,8 @@ import { Track } from 'src/models/track.model';
 import { Album } from 'src/models/album.model';
 import { Artist } from 'src/models/artist.model';
 
+import { Entity } from 'src/enums/entity.enum';
+
 @Injectable()
 export class FavsService {
   constructor(
@@ -23,12 +25,6 @@ export class FavsService {
     tracks: [],
   };
 
-  private entityServiceMap: Record<string, any> = {
-    track: this.trackService,
-    album: this.albumService,
-    artist: this.artistService,
-  };
-
   getFavs(): FavoritesResponse {
     return this.favourites;
   }
@@ -39,18 +35,17 @@ export class FavsService {
       let favList;
 
       switch (entityIdentifier) {
-        case 'track':
+        case Entity.TRACK:
           entity = this.trackService.getTrack(id);
           favList = this.favourites.tracks;
           break;
-        case 'album':
+        case Entity.ALBUM:
           entity = this.albumService.getAlbum(id);
           favList = this.favourites.albums;
           break;
-        case 'artist':
+        case Entity.ARTIST:
           entity = this.artistService.getArtist(id);
           favList = this.favourites.artists;
-
           break;
         default:
           throw new Error(`Unknown entity type: ${entityIdentifier}`);
@@ -78,15 +73,14 @@ export class FavsService {
     let entityList;
 
     switch (entityIdentifier) {
-      case 'track':
+      case Entity.TRACK:
         entityList = this.favourites.tracks;
         break;
-      case 'album':
+      case Entity.ALBUM:
         entityList = this.favourites.albums;
         break;
-      case 'artist':
+      case Entity.ARTIST:
         entityList = this.favourites.artists;
-
         break;
       default:
         throw new Error(`Unknown entity type: ${entityIdentifier}`);

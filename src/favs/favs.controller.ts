@@ -10,6 +10,8 @@ import {
 import { FavsService } from './favs.service';
 import { FavoritesResponse } from 'src/models/favs.model';
 
+import { Entity } from 'src/enums/entity.enum';
+
 @Controller('favs')
 export class FavsController {
   constructor(private favsService: FavsService) {}
@@ -21,34 +23,34 @@ export class FavsController {
 
   @Post('/track/:id')
   AddTrackToFavs(@Param('id', ParseUUIDPipe) id: string): string {
-    return this.favsService.addToFavs(id, 'track');
+    return this.favsService.addToFavs(id, Entity.TRACK);
   }
 
   @Delete('/track/:id')
   @HttpCode(204)
   deleteTrackFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
-    this.favsService.deleteFromFavs(id, 'track');
+    this.favsService.deleteFromFavs(id, Entity.TRACK);
   }
 
   @Post('/album/:id')
   AddAlbumToFavs(@Param('id', ParseUUIDPipe) id: string): string {
-    return this.favsService.addToFavs(id, 'album');
+    return this.favsService.addToFavs(id, Entity.ALBUM);
   }
 
   @Delete('/album/:id')
   @HttpCode(204)
   deleteAlbumFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
-    this.favsService.deleteFromFavs(id, 'album');
+    this.favsService.deleteFromFavs(id, Entity.ALBUM);
   }
 
   @Post('/artist/:id')
   AddArtistToFavs(@Param('id', ParseUUIDPipe) id: string): string {
-    return this.favsService.addToFavs(id, 'artist');
+    return this.favsService.addToFavs(id, Entity.ARTIST);
   }
 
   @Delete('/artist/:id')
   @HttpCode(204)
   deleteArtistFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
-    this.favsService.deleteFromFavs(id, 'artist');
+    this.favsService.deleteFromFavs(id, Entity.ARTIST);
   }
 }
