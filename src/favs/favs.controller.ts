@@ -40,4 +40,15 @@ export class FavsController {
   deleteAlbumFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
     this.favsService.deleteAlbumFromFavs(id);
   }
+
+  @Post('/artist/:id')
+  AddArtistToFavs(@Param('id', ParseUUIDPipe) id: string): string {
+    return this.favsService.addArtistToFavs(id);
+  }
+
+  @Delete('/artist/:id')
+  @HttpCode(204)
+  deleteArtistFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
+    this.favsService.deleteArtistFromFavs(id);
+  }
 }
