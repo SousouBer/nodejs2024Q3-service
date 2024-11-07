@@ -21,17 +21,19 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  findAll(): User[] {
+  findAll(): Partial<User>[] {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string): User {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Partial<User> {
     return this.userService.findOne(id);
   }
 
   @Post()
-  createUser(@Body(ValidationPipe) createUserDto: CreateUserDto): User {
+  createUser(
+    @Body(ValidationPipe) createUserDto: CreateUserDto,
+  ): Partial<User> {
     return this.userService.createUser(createUserDto);
   }
 
@@ -39,7 +41,7 @@ export class UserController {
   updatePassword(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updatePasswordDto: UpdatePasswordDto,
-  ): User {
+  ): Partial<User> {
     return this.userService.updatePassword(id, updatePasswordDto);
   }
 
