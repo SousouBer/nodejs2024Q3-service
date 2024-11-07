@@ -5,6 +5,9 @@ import { FavoritesResponse } from 'src/models/favs.model';
 import { TrackService } from 'src/track/track.service';
 import { NotInFavoritesException } from 'src/exceptions/not-in-favs.exception';
 import { EntityAlreadyInFavoritesException } from 'src/exceptions/already-in-favs.exception';
+import { Track } from 'src/models/track.model';
+import { Album } from 'src/models/album.model';
+import { Artist } from 'src/models/artist.model';
 
 @Injectable()
 export class FavsService {
@@ -20,106 +23,87 @@ export class FavsService {
     tracks: [],
   };
 
+  private entityServiceMap: Record<string, any> = {
+    track: this.trackService,
+    album: this.albumService,
+    artist: this.artistService,
+  };
+
   getFavs(): FavoritesResponse {
     return this.favourites;
   }
 
-  addTrackToFavs(id: string) {
+  addToFavs(id: string, entityIdentifier: 'track' | 'album' | 'artist') {
     try {
-      const track = this.trackService.getTrack(id);
+      let entity: Album | Track | Artist;
+      let favList;
 
-      if (this.favourites.tracks.includes(track)) {
-        throw new EntityAlreadyInFavoritesException(id, 'track');
+      switch (entityIdentifier) {
+        case 'track':
+          entity = this.trackService.getTrack(id);
+          favList = this.favourites.tracks;
+          break;
+        case 'album':
+          entity = this.albumService.getAlbum(id);
+          favList = this.favourites.albums;
+          break;
+        case 'artist':
+          entity = this.artistService.getArtist(id);
+          favList = this.favourites.artists;
+
+          break;
+        default:
+          throw new Error(`Unknown entity type: ${entityIdentifier}`);
       }
 
-      this.favourites.tracks.push(track);
+      if (favList.includes(entity)) {
+        throw new EntityAlreadyInFavoritesException(id, entityIdentifier);
+      }
 
-      return 'Track added Successfully!';
+      favList.push(entity);
+
+      return 'Entity added Successfully!';
     } catch (error) {
       if (error instanceof NotFoundException) {
-        throw new NotInFavoritesException(id, 'track');
+        throw new NotInFavoritesException(id, entityIdentifier);
       }
       throw error;
     }
   }
 
-  deleteTrackFromFavs(id: string): void {
-    const track = this.favourites.tracks.find((track) => track.id === id);
+  deleteFromFavs(
+    id: string,
+    entityIdentifier: 'track' | 'album' | 'artist',
+  ): void {
+    let entityList;
 
-    if (!track) {
-      throw new NotFoundException(
-        `Track with ID ${id} is not in the favourites.`,
-      );
+    switch (entityIdentifier) {
+      case 'track':
+        entityList = this.favourites.tracks;
+        break;
+      case 'album':
+        entityList = this.favourites.albums;
+        break;
+      case 'artist':
+        entityList = this.favourites.artists;
+
+        break;
+      default:
+        throw new Error(`Unknown entity type: ${entityIdentifier}`);
     }
 
-    this.favourites.tracks = this.favourites.tracks.filter(
-      (track) => track.id !== id,
+    const entity: Album | Artist | Track = entityList.find(
+      (entity: Album | Artist | Track) => entity.id === id,
     );
-  }
 
-  addAlbumToFavs(id: string) {
-    try {
-      const album = this.albumService.getAlbum(id);
-
-      if (this.favourites.albums.includes(album)) {
-        throw new EntityAlreadyInFavoritesException(id, 'album');
-      }
-
-      this.favourites.albums.push(album);
-
-      return 'Album added Successfully!';
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotInFavoritesException(id, 'album');
-      }
-      throw error;
-    }
-  }
-
-  deleteAlbumFromFavs(id: string): void {
-    const album = this.favourites.albums.find((album) => album.id === id);
-
-    if (!album) {
+    if (!entity) {
       throw new NotFoundException(
-        `Album with ID ${id} is not in the favourites.`,
+        `${entityIdentifier} with ID ${id} is not in the favourites.`,
       );
     }
 
-    this.favourites.albums = this.favourites.albums.filter(
-      (album) => album.id !== id,
-    );
-  }
-
-  addArtistToFavs(id: string) {
-    try {
-      const artist = this.artistService.getArtist(id);
-
-      if (this.favourites.artists.includes(artist)) {
-        throw new EntityAlreadyInFavoritesException(id, 'artist');
-      }
-
-      this.favourites.artists.push(artist);
-
-      return 'Artist added Successfully!';
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotInFavoritesException(id, 'artist');
-      }
-      throw error;
-    }
-  }
-
-  deleteArtistFromFavs(id: string): void {
-    const artist = this.favourites.artists.find((artist) => artist.id === id);
-
-    if (!artist) {
-      throw new NotFoundException(
-        `Artst with ID ${id} is not in the favourites.`,
-      );
-    }
-
-    this.favourites.artists = this.favourites.artists.filter(
-      (artist) => artist.id !== id,
+    this.favourites[entityIdentifier + 's'] = entityList.filter(
+      (entity: Album | Artist | Track) => entity.id !== id,
     );
   }
 }

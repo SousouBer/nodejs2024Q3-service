@@ -21,34 +21,34 @@ export class FavsController {
 
   @Post('/track/:id')
   AddTrackToFavs(@Param('id', ParseUUIDPipe) id: string): string {
-    return this.favsService.addTrackToFavs(id);
+    return this.favsService.addToFavs(id, 'track');
   }
 
   @Delete('/track/:id')
   @HttpCode(204)
   deleteTrackFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
-    this.favsService.deleteTrackFromFavs(id);
+    this.favsService.deleteFromFavs(id, 'track');
   }
 
   @Post('/album/:id')
   AddAlbumToFavs(@Param('id', ParseUUIDPipe) id: string): string {
-    return this.favsService.addAlbumToFavs(id);
+    return this.favsService.addToFavs(id, 'album');
   }
 
   @Delete('/album/:id')
   @HttpCode(204)
   deleteAlbumFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
-    this.favsService.deleteAlbumFromFavs(id);
+    this.favsService.deleteFromFavs(id, 'album');
   }
 
   @Post('/artist/:id')
   AddArtistToFavs(@Param('id', ParseUUIDPipe) id: string): string {
-    return this.favsService.addArtistToFavs(id);
+    return this.favsService.addToFavs(id, 'artist');
   }
 
   @Delete('/artist/:id')
   @HttpCode(204)
   deleteArtistFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
-    this.favsService.deleteArtistFromFavs(id);
+    this.favsService.deleteFromFavs(id, 'artist');
   }
 }
