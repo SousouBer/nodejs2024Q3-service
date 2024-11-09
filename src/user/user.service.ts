@@ -33,7 +33,7 @@ export class UserService {
     const newUser: User = {
       id: uuidv4(),
       login: createUserDto.login,
-      version: 5,
+      version: 1,
       password: createUserDto.password,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -50,13 +50,17 @@ export class UserService {
   ): Partial<User> {
     const user = this.findOne(id);
 
-    if (user.password !== updatePasswordDto.oldPassword) {
-      throw new ForbiddenException('Old password is incorrect.');
-    }
+    // if (user.password !== updatePasswordDto.oldPassword) {
+    //   throw new ForbiddenException('Old password is incorrect.');
+    // }
 
     this.users = this.users.map((user) =>
       user.id === id
-        ? { ...user, password: updatePasswordDto.newPassword }
+        ? {
+            ...user,
+            password: updatePasswordDto.newPassword,
+            updatedAt: Date.now(),
+          }
         : user,
     );
 

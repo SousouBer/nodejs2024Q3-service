@@ -40,9 +40,9 @@ export class CleanupService {
   }
 
   cleanupTrack(id: string): void {
-    const track = this.trackService
-      .getAllTracks()
-      .find((track) => track.id === id);
+    const track = this.favService
+      .getFavs()
+      .tracks.find((track) => track.id === id);
 
     if (track) {
       this.favService.deleteFromFavs(id, Entity.TRACK);

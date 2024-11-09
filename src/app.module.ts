@@ -15,7 +15,22 @@ import { CleanupService } from './helpers/cleanup/cleanup.service';
 
 @Module({
   imports: [],
-  controllers: [AppController, UserController, TrackController, ArtistController, AlbumController, FavsController],
-  providers: [AppService, UserService, TrackService, ArtistService, AlbumService, FavsService, CleanupService],
+  controllers: [
+    AppController,
+    UserController,
+    TrackController,
+    ArtistController,
+    AlbumController,
+    FavsController,
+  ],
+  providers: [
+    AppService,
+    UserService,
+    TrackService,
+    ArtistService,
+    AlbumService,
+    FavsService,
+    CleanupService,
+  ],
 })
 export class AppModule {}

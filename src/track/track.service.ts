@@ -50,7 +50,7 @@ export class TrackService {
   deleteTrack(id: string): void {
     this.getTrack(id);
 
-    this.tracks = this.tracks.filter((user) => user.id !== id);
+    this.tracks = this.tracks.filter((track) => track.id !== id);
   }
 
   deleteArtist(id: string): void {
