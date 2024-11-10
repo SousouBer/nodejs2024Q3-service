@@ -26,7 +26,9 @@ export class UserService {
       throw new NotFoundException(`User with ID ${id} does not exist`);
     }
 
-    return this.removePasswordFromUser(user);
+    return user;
+
+    // return this.removePasswordFromUser(user);
   }
 
   createUser(createUserDto: CreateUserDto): Partial<User> {
@@ -50,9 +52,9 @@ export class UserService {
   ): Partial<User> {
     const user = this.findOne(id);
 
-    // if (user.password !== updatePasswordDto.oldPassword) {
-    //   throw new ForbiddenException('Old password is incorrect.');
-    // }
+    if (user.password !== updatePasswordDto.oldPassword) {
+      throw new ForbiddenException('Old password is incorrect.');
+    }
 
     this.users = this.users.map((user) =>
       user.id === id
@@ -60,11 +62,14 @@ export class UserService {
             ...user,
             password: updatePasswordDto.newPassword,
             updatedAt: Date.now(),
+            version: user.version + 1,
           }
         : user,
     );
 
-    return this.removePasswordFromUser(user);
+    const updatedUser = this.findOne(id);
+
+    return this.removePasswordFromUser(updatedUser);
   }
 
   deleteUser(id: string): void {
