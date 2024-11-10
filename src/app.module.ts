@@ -9,8 +9,11 @@ import { TrackModule } from './track/track.module';
 import { FavsModule } from './favs/favs.module';
 import { CleanupModule } from './helpers/cleanup/cleanup.module';
 
+import { ConfigModule } from '@nestjs/config';
+
 @Module({
   imports: [
+    ConfigModule.forRoot({ envFilePath: '.env' }),
     UserModule,
     ArtistModule,
     AlbumModule,
