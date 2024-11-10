@@ -1,10 +1,13 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TrackController } from './track.controller';
 import { TrackService } from './track.service';
 
-@Module({})
-export class TrackModule {
-  controllers: [TrackController];
-  providers: [TrackService];
-  exports: [TrackService];
-}
+import { CleanupModule } from 'src/helpers/cleanup/cleanup.module';
+
+@Module({
+  controllers: [TrackController],
+  providers: [TrackService],
+  imports: [forwardRef(() => CleanupModule)],
+  exports: [TrackService],
+})
+export class TrackModule {}

@@ -2,8 +2,10 @@ import {
   Body,
   Controller,
   Delete,
+  forwardRef,
   Get,
   HttpCode,
+  Inject,
   Param,
   ParseUUIDPipe,
   Post,
@@ -20,7 +22,8 @@ import { CleanupService } from 'src/helpers/cleanup/cleanup.service';
 export class TrackController {
   constructor(
     private trackService: TrackService,
-    private cleanupService: CleanupService,
+    @Inject(forwardRef(() => CleanupService))
+    private readonly cleanupService: CleanupService,
   ) {}
 
   @Get()

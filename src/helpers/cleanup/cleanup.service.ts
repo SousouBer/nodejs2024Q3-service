@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AlbumService } from 'src/album/album.service';
-import { ArtistService } from 'src/artist/artist.service';
 import { Entity } from 'src/enums/entity.enum';
 import { FavsService } from 'src/favs/favs.service';
 import { TrackService } from 'src/track/track.service';
@@ -8,10 +7,12 @@ import { TrackService } from 'src/track/track.service';
 @Injectable()
 export class CleanupService {
   constructor(
-    private albumService: AlbumService,
-    private artistService: ArtistService,
-    private trackService: TrackService,
-    private favService: FavsService,
+    @Inject(forwardRef(() => AlbumService))
+    private readonly albumService: AlbumService,
+    @Inject(forwardRef(() => FavsService))
+    private readonly favService: FavsService,
+    @Inject(forwardRef(() => TrackService))
+    private readonly trackService: TrackService,
   ) {}
 
   cleanupArtist(id: string): void {
