@@ -3,19 +3,31 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
 
 import { CreateUserDto } from 'src/models/create-user.dto';
 import { User } from 'src/models/user.model';
 import { UpdatePasswordDto } from 'src/models/update-password.dto';
+import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class UserService {
+  constructor(private readonly databaseService: DatabaseService) {}
+
   private users: User[] = [];
 
-  findAll(): Partial<User>[] {
-    return this.users.map((user) => {
-      return this.removePasswordFromUser(user);
+  async getUsers(): Promise<Partial<User>[]> {
+    // return this.users.map((user) => {
+    //   return this.removePasswordFromUser(user);
+    // });
+
+    return this.databaseService.user.findMany({
+      select: {
+        id: true,
+        login: true,
+        version: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
@@ -31,19 +43,10 @@ export class UserService {
     // return this.removePasswordFromUser(user);
   }
 
-  createUser(createUserDto: CreateUserDto): Partial<User> {
-    const newUser: User = {
-      id: uuidv4(),
-      login: createUserDto.login,
-      version: 1,
-      password: createUserDto.password,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
-
-    this.users.push(newUser);
-
-    return this.removePasswordFromUser(newUser);
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    return this.databaseService.user.create({
+      data: createUserDto,
+    });
   }
 
   updatePassword(
@@ -56,16 +59,16 @@ export class UserService {
       throw new ForbiddenException('Old password is incorrect.');
     }
 
-    this.users = this.users.map((user) =>
-      user.id === id
-        ? {
-            ...user,
-            password: updatePasswordDto.newPassword,
-            updatedAt: Date.now(),
-            version: user.version + 1,
-          }
-        : user,
-    );
+    // this.users = this.users.map((user) =>
+    //   user.id === id
+    //     ? {
+    //         ...user,
+    //         password: updatePasswordDto.newPassword,
+    //         updatedAt: Date.now(),
+    //         version: user.version + 1,
+    //       }
+    //     : user,
+    // );
 
     const updatedUser = this.findOne(id);
 

@@ -10,6 +10,7 @@ import { FavsModule } from './favs/favs.module';
 import { CleanupModule } from './helpers/cleanup/cleanup.module';
 
 import { ConfigModule } from '@nestjs/config';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ConfigModule } from '@nestjs/config';
     TrackModule,
     FavsModule,
     CleanupModule,
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

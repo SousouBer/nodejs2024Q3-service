@@ -21,8 +21,8 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  findAll(): Partial<User>[] {
-    return this.userService.findAll();
+  getUsers(): Promise<Partial<User>[]> {
+    return this.userService.getUsers();
   }
 
   @Get(':id')
@@ -33,7 +33,7 @@ export class UserController {
   @Post()
   createUser(
     @Body(ValidationPipe) createUserDto: CreateUserDto,
-  ): Partial<User> {
+  ): Promise<User> {
     return this.userService.createUser(createUserDto);
   }
 
