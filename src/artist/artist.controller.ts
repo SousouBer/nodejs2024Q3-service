@@ -27,17 +27,19 @@ export class ArtistController {
   ) {}
 
   @Get()
-  getAllArtists(): Artist[] {
+  getAllArtists(): Promise<Artist[]> {
     return this.artistService.getAllArtists();
   }
 
   @Get(':id')
-  getArtist(@Param('id', ParseUUIDPipe) id: string): Artist {
+  getArtist(@Param('id', ParseUUIDPipe) id: string): Promise<Artist> {
     return this.artistService.getArtist(id);
   }
 
   @Post()
-  createArtist(@Body(ValidationPipe) createArtistDto: CreateArtistDto): Artist {
+  createArtist(
+    @Body(ValidationPipe) createArtistDto: CreateArtistDto,
+  ): Promise<Artist> {
     return this.artistService.createArtist(createArtistDto);
   }
 
@@ -45,14 +47,14 @@ export class ArtistController {
   updateArtist(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updateArtistDto: UpdateArtistDto,
-  ): Artist {
+  ): Promise<Artist> {
     return this.artistService.updateArtist(id, updateArtistDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  deleteArtist(@Param('id', ParseUUIDPipe) id: string): void {
-    this.artistService.deleteArtist(id);
-    this.cleanupService.cleanupArtist(id);
+  deleteArtist(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.artistService.deleteArtist(id);
+    // this.cleanupService.cleanupArtist(id);
   }
 }
