@@ -2,19 +2,21 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Track } from 'src/models/track.model';
 import { CreateTrackDto } from './dto/create-track.dto';
 
-import { v4 as uuidv4 } from 'uuid';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class TrackService {
-  private tracks: Track[] = [];
+  constructor(private readonly databaseService: DatabaseService) {}
 
-  getAllTracks(): Track[] {
-    return this.tracks;
+  async getAllTracks(): Promise<Track[]> {
+    return await this.databaseService.track.findMany();
   }
 
-  getTrack(id: string): Track {
-    const track = this.tracks.find((track) => track.id === id);
+  async getTrack(id: string): Promise<Track> {
+    const track = await this.databaseService.track.findUnique({
+      where: { id },
+    });
 
     if (!track) {
       throw new NotFoundException(`Track with ID ${id} does not exist`);
@@ -23,49 +25,49 @@ export class TrackService {
     return track;
   }
 
-  createTrack(createTrackDto: CreateTrackDto): Track {
-    const newTrack: Track = {
-      id: uuidv4(),
-      name: createTrackDto.name,
-      artistId: createTrackDto.artistId,
-      albumId: createTrackDto.albumId,
-      duration: createTrackDto.duration,
-    };
-
-    this.tracks.push(newTrack);
-
-    return newTrack;
+  async createTrack(createTrackDto: CreateTrackDto): Promise<Track> {
+    return await this.databaseService.track.create({ data: createTrackDto });
   }
 
-  updateTrack(id: string, updateTrackDto: UpdateTrackDto): Track {
-    const track = this.getTrack(id);
+  async updateTrack(
+    id: string,
+    updateTrackDto: UpdateTrackDto,
+  ): Promise<Track> {
+    const track = await this.databaseService.track.findUnique({
+      where: { id },
+    });
 
-    this.tracks = this.tracks.map((track) =>
-      track.id === id ? { ...track, ...updateTrackDto } : track,
-    );
+    if (!track) {
+      throw new NotFoundException(`Track with ID ${id} does not exist`);
+    }
 
-    return { ...track, ...updateTrackDto };
-  }
-
-  deleteTrack(id: string): void {
-    this.getTrack(id);
-
-    this.tracks = this.tracks.filter((track) => track.id !== id);
-  }
-
-  deleteArtist(id: string): void {
-    this.tracks.forEach((track) => {
-      if (track.artistId === id) {
-        track.artistId = null;
-      }
+    return await this.databaseService.track.update({
+      where: { id },
+      data: updateTrackDto,
     });
   }
 
-  deleteAlbum(id: string): void {
-    this.tracks.forEach((track) => {
-      if (track.albumId === id) {
-        track.albumId = null;
-      }
-    });
+  async deleteTrack(id: string): Promise<void> {
+    try {
+      await this.databaseService.track.delete({ where: { id } });
+    } catch {
+      throw new NotFoundException(`Track with ID ${id} does not exist`);
+    }
   }
+
+  // deleteArtist(id: string): void {
+  //   this.tracks.forEach((track) => {
+  //     if (track.artistId === id) {
+  //       track.artistId = null;
+  //     }
+  //   });
+  // }
+
+  // deleteAlbum(id: string): void {
+  //   this.tracks.forEach((track) => {
+  //     if (track.albumId === id) {
+  //       track.albumId = null;
+  //     }
+  //   });
+  // }
 }
