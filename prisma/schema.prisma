@@ -59,7 +59,7 @@ model Track {
 }
 
 model Favorites {
-  id String @id @default(uuid())
+  id String @id @default("1")
 
   artists Artist[]
   albums Album[]
