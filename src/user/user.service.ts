@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 
 import { CreateUserDto } from 'src/models/create-user.dto';
-import { User } from 'src/models/user.model';
+import { UserWithoutPassword } from 'src/models/user.model';
 import { UpdatePasswordDto } from 'src/models/update-password.dto';
 import { DatabaseService } from 'src/database/database.service';
 
@@ -21,13 +21,15 @@ const userFields = {
 export class UserService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async getUsers(): Promise<Partial<User>[]> {
-    return this.databaseService.user.findMany({
+  async getUsers(): Promise<UserWithoutPassword[]> {
+    const users = await this.databaseService.user.findMany({
       select: userFields,
     });
+
+    return users.map((user) => this.convertDateToNumber(user));
   }
 
-  async getUser(id: string): Promise<Partial<User>> {
+  async getUser(id: string): Promise<UserWithoutPassword> {
     const user = await this.databaseService.user.findUnique({
       where: {
         id,
@@ -39,19 +41,22 @@ export class UserService {
       throw new NotFoundException(`User with ID ${id} does not exist`);
     }
 
-    return user;
+    return this.convertDateToNumber(user);
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
-    return this.databaseService.user.create({
+  async createUser(createUserDto: CreateUserDto): Promise<UserWithoutPassword> {
+    const createdUser = await this.databaseService.user.create({
       data: createUserDto,
+      select: userFields,
     });
+
+    return this.convertDateToNumber(createdUser);
   }
 
   async updatePassword(
     id: string,
     updatePasswordDto: UpdatePasswordDto,
-  ): Promise<Partial<User>> {
+  ): Promise<UserWithoutPassword> {
     const user = await this.databaseService.user.findUnique({
       where: { id },
     });
@@ -73,7 +78,7 @@ export class UserService {
       select: userFields,
     });
 
-    return updatedUser;
+    return this.convertDateToNumber(updatedUser);
   }
 
   async deleteUser(id: string): Promise<void> {
@@ -84,5 +89,13 @@ export class UserService {
     } catch {
       throw new NotFoundException(`User with ID ${id} does not exist`);
     }
+  }
+
+  private convertDateToNumber(user): UserWithoutPassword {
+    return {
+      ...user,
+      createdAt: new Date(user.createdAt).getTime(),
+      updatedAt: new Date(user.updatedAt).getTime(),
+    };
   }
 }
