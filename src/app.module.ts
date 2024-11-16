@@ -7,7 +7,6 @@ import { ArtistModule } from './artist/artist.module';
 import { AlbumModule } from './album/album.module';
 import { TrackModule } from './track/track.module';
 import { FavsModule } from './favs/favs.module';
-import { CleanupModule } from './helpers/cleanup/cleanup.module';
 
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
@@ -20,7 +19,6 @@ import { DatabaseModule } from './database/database.module';
     AlbumModule,
     TrackModule,
     FavsModule,
-    CleanupModule,
     DatabaseModule,
   ],
   controllers: [AppController],

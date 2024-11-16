@@ -2,10 +2,8 @@ import {
   Body,
   Controller,
   Delete,
-  forwardRef,
   Get,
   HttpCode,
-  Inject,
   Param,
   ParseUUIDPipe,
   Post,
@@ -16,15 +14,10 @@ import { ArtistService } from './artist.service';
 import { Artist } from 'src/models/artist.model';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { CleanupService } from 'src/helpers/cleanup/cleanup.service';
 
 @Controller('artist')
 export class ArtistController {
-  constructor(
-    private artistService: ArtistService,
-    @Inject(forwardRef(() => CleanupService))
-    private readonly cleanupService: CleanupService,
-  ) {}
+  constructor(private artistService: ArtistService) {}
 
   @Get()
   getAllArtists(): Promise<Artist[]> {
@@ -55,6 +48,5 @@ export class ArtistController {
   @HttpCode(204)
   deleteArtist(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.artistService.deleteArtist(id);
-    // this.cleanupService.cleanupArtist(id);
   }
 }

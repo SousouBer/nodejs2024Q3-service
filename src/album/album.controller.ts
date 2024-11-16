@@ -2,10 +2,8 @@ import {
   Body,
   Controller,
   Delete,
-  forwardRef,
   Get,
   HttpCode,
-  Inject,
   Param,
   ParseUUIDPipe,
   Post,
@@ -16,15 +14,10 @@ import { AlbumService } from './album.service';
 import { Album } from 'src/models/album.model';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { CleanupService } from 'src/helpers/cleanup/cleanup.service';
 
 @Controller('album')
 export class AlbumController {
-  constructor(
-    private albumService: AlbumService,
-    @Inject(forwardRef(() => CleanupService))
-    private readonly cleanupService: CleanupService,
-  ) {}
+  constructor(private albumService: AlbumService) {}
 
   @Get()
   getAllAlbums(): Promise<Album[]> {
@@ -55,6 +48,5 @@ export class AlbumController {
   @HttpCode(204)
   deleteAlbum(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.albumService.deleteAlbum(id);
-    // this.cleanupService.cleanupAlbum(id);
   }
 }

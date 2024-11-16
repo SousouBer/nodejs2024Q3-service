@@ -2,10 +2,8 @@ import {
   Body,
   Controller,
   Delete,
-  forwardRef,
   Get,
   HttpCode,
-  Inject,
   Param,
   ParseUUIDPipe,
   Post,
@@ -16,15 +14,10 @@ import { TrackService } from './track.service';
 import { Track } from 'src/models/track.model';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { CleanupService } from 'src/helpers/cleanup/cleanup.service';
 
 @Controller('track')
 export class TrackController {
-  constructor(
-    private trackService: TrackService,
-    @Inject(forwardRef(() => CleanupService))
-    private readonly cleanupService: CleanupService,
-  ) {}
+  constructor(private trackService: TrackService) {}
 
   @Get()
   getAllTracks(): Promise<Track[]> {
@@ -55,7 +48,5 @@ export class TrackController {
   @HttpCode(204)
   deleteTrack(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.trackService.deleteTrack(id);
-
-    // this.cleanupService.cleanupTrack(id);
   }
 }
