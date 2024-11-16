@@ -10,47 +10,45 @@ import {
 import { FavsService } from './favs.service';
 import { FavoritesResponse } from 'src/models/favs.model';
 
-import { Entity } from 'src/enums/entity.enum';
-
 @Controller('favs')
 export class FavsController {
   constructor(private favsService: FavsService) {}
 
   @Get()
-  getFavs(): FavoritesResponse {
+  getFavs(): Promise<FavoritesResponse> {
     return this.favsService.getFavs();
   }
 
   @Post('/track/:id')
-  AddTrackToFavs(@Param('id', ParseUUIDPipe) id: string): string {
-    return this.favsService.addToFavs(id, Entity.TRACK);
+  AddTrackToFavs(@Param('id', ParseUUIDPipe) id: string): Promise<string> {
+    return this.favsService.addTrack(id);
   }
 
   @Delete('/track/:id')
   @HttpCode(204)
-  deleteTrackFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
-    this.favsService.deleteFromFavs(id, Entity.TRACK);
+  deleteTrackFromFavs(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.favsService.deleteTrack(id);
   }
 
   @Post('/album/:id')
-  AddAlbumToFavs(@Param('id', ParseUUIDPipe) id: string): string {
-    return this.favsService.addToFavs(id, Entity.ALBUM);
+  AddAlbumToFavs(@Param('id', ParseUUIDPipe) id: string): Promise<string> {
+    return this.favsService.addAlbum(id);
   }
 
   @Delete('/album/:id')
   @HttpCode(204)
-  deleteAlbumFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
-    this.favsService.deleteFromFavs(id, Entity.ALBUM);
+  deleteAlbumFromFavs(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.favsService.deleteAlbum(id);
   }
 
   @Post('/artist/:id')
-  AddArtistToFavs(@Param('id', ParseUUIDPipe) id: string): string {
-    return this.favsService.addToFavs(id, Entity.ARTIST);
+  AddArtistToFavs(@Param('id', ParseUUIDPipe) id: string): Promise<string> {
+    return this.favsService.addArtist(id);
   }
 
   @Delete('/artist/:id')
   @HttpCode(204)
-  deleteArtistFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
-    this.favsService.deleteFromFavs(id, Entity.ARTIST);
+  deleteArtistFromFavs(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.favsService.deleteArtist(id);
   }
 }

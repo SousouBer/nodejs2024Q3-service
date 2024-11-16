@@ -52,7 +52,6 @@ export class ArtistService {
   }
 
   async deleteArtist(id: string): Promise<void> {
-    this.getArtist(id);
     try {
       await this.databaseService.artist.delete({
         where: { id },

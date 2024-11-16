@@ -15,38 +15,38 @@ export class CleanupService {
     private readonly trackService: TrackService,
   ) {}
 
-  cleanupArtist(id: string): void {
-    this.albumService.deleteArtist(id);
-    this.trackService.deleteArtist(id);
+  // cleanupArtist(id: string): void {
+  //   this.albumService.deleteArtist(id);
+  //   this.trackService.deleteArtist(id);
 
-    const artist = this.favService
-      .getFavs()
-      .artists.find((artist) => artist.id === id);
+  //   const artist = this.favService
+  //     .getFavs()
+  //     .artists.find((artist) => artist.id === id);
 
-    if (artist) {
-      this.favService.deleteFromFavs(id, Entity.ARTIST);
-    }
-  }
+  //   if (artist) {
+  //     this.favService.deleteFromFavs(id, Entity.ARTIST);
+  //   }
+  // }
 
-  cleanupAlbum(id: string): void {
-    this.trackService.deleteAlbum(id);
+  // cleanupAlbum(id: string): void {
+  //   this.trackService.deleteAlbum(id);
 
-    const album = this.favService
-      .getFavs()
-      .albums.find((album) => album.id === id);
+  //   const album = this.favService
+  //     .getFavs()
+  //     .albums.find((album) => album.id === id);
 
-    if (album) {
-      this.favService.deleteFromFavs(id, Entity.ALBUM);
-    }
-  }
+  //   if (album) {
+  //     this.favService.deleteFromFavs(id, Entity.ALBUM);
+  //   }
+  // }
 
-  cleanupTrack(id: string): void {
-    const track = this.favService
-      .getFavs()
-      .tracks.find((track) => track.id === id);
+  // cleanupTrack(id: string): void {
+  //   const track = this.favService
+  //     .getFavs()
+  //     .tracks.find((track) => track.id === id);
 
-    if (track) {
-      this.favService.deleteFromFavs(id, Entity.TRACK);
-    }
-  }
+  //   if (track) {
+  //     this.favService.deleteFromFavs(id, Entity.TRACK);
+  //   }
+  // }
 }
