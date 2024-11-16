@@ -2,19 +2,21 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Album } from 'src/models/album.model';
 import { CreateAlbumDto } from './dto/create-album.dto';
 
-import { v4 as uuidv4 } from 'uuid';
 import { UpdateAlbumDto } from './dto/update-album.dto';
+import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class AlbumService {
-  private albums: Album[] = [];
+  constructor(private readonly databaseService: DatabaseService) {}
 
-  getAllAlbums(): Album[] {
-    return this.albums;
+  async getAllAlbums(): Promise<Album[]> {
+    return await this.databaseService.album.findMany();
   }
 
-  getAlbum(id: string): Album {
-    const album = this.albums.find((album) => album.id === id);
+  async getAlbum(id: string): Promise<Album> {
+    const album = await this.databaseService.album.findUnique({
+      where: { id },
+    });
 
     if (!album) {
       throw new NotFoundException(`Album with ID ${id} does not exist`);
@@ -23,40 +25,43 @@ export class AlbumService {
     return album;
   }
 
-  createAlbum(createAlbumDto: CreateAlbumDto): Album {
-    const newAlbum: Album = {
-      id: uuidv4(),
-      name: createAlbumDto.name,
-      year: createAlbumDto.year,
-      artistId: createAlbumDto.artistId,
-    };
-
-    this.albums.push(newAlbum);
-
-    return newAlbum;
+  async createAlbum(createAlbumDto: CreateAlbumDto): Promise<Album> {
+    return await this.databaseService.album.create({ data: createAlbumDto });
   }
 
-  updateAlbum(id: string, updateAlbumDto: UpdateAlbumDto): Album {
-    const album = this.getAlbum(id);
+  async updateAlbum(
+    id: string,
+    updateAlbumDto: UpdateAlbumDto,
+  ): Promise<Album> {
+    const album = await this.databaseService.album.findUnique({
+      where: { id },
+    });
 
-    this.albums = this.albums.map((album) =>
-      album.id === id ? { ...album, ...updateAlbumDto } : album,
-    );
+    if (!album) {
+      throw new NotFoundException(`Album with ID ${id} does not exist`);
+    }
 
-    return { ...album, ...updateAlbumDto };
-  }
-
-  deleteAlbum(id: string): void {
-    this.getAlbum(id);
-
-    this.albums = this.albums.filter((album) => album.id !== id);
-  }
-
-  deleteArtist(artistId: string): void {
-    this.albums.forEach((album) => {
-      if (album.artistId === artistId) {
-        album.artistId = null;
-      }
+    return await this.databaseService.album.update({
+      where: { id },
+      data: updateAlbumDto,
     });
   }
+
+  async deleteAlbum(id: string): Promise<void> {
+    try {
+      await this.databaseService.album.delete({
+        where: { id },
+      });
+    } catch {
+      throw new NotFoundException(`Album with ID ${id} does not exist`);
+    }
+  }
+
+  // deleteArtist(artistId: string): void {
+  //   this.albums.forEach((album) => {
+  //     if (album.artistId === artistId) {
+  //       album.artistId = null;
+  //     }
+  //   });
+  // }
 }
