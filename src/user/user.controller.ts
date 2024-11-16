@@ -26,8 +26,8 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string): Partial<User> {
-    return this.userService.findOne(id);
+  getUser(@Param('id', ParseUUIDPipe) id: string): Promise<Partial<User>> {
+    return this.userService.getUser(id);
   }
 
   @Post()
@@ -41,13 +41,13 @@ export class UserController {
   updatePassword(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updatePasswordDto: UpdatePasswordDto,
-  ): Partial<User> {
+  ): Promise<Partial<User>> {
     return this.userService.updatePassword(id, updatePasswordDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  removeUser(@Param('id', ParseUUIDPipe) id: string): void {
-    this.userService.deleteUser(id);
+  removeUser(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.userService.deleteUser(id);
   }
 }

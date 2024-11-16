@@ -9,38 +9,37 @@ import { User } from 'src/models/user.model';
 import { UpdatePasswordDto } from 'src/models/update-password.dto';
 import { DatabaseService } from 'src/database/database.service';
 
+const userFields = {
+  id: true,
+  login: true,
+  version: true,
+  createdAt: true,
+  updatedAt: true,
+};
+
 @Injectable()
 export class UserService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  private users: User[] = [];
-
   async getUsers(): Promise<Partial<User>[]> {
-    // return this.users.map((user) => {
-    //   return this.removePasswordFromUser(user);
-    // });
-
     return this.databaseService.user.findMany({
-      select: {
-        id: true,
-        login: true,
-        version: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: userFields,
     });
   }
 
-  findOne(id: string): Partial<User> {
-    const user = this.users.find((user) => user.id === id);
+  async getUser(id: string): Promise<Partial<User>> {
+    const user = await this.databaseService.user.findUnique({
+      where: {
+        id,
+      },
+      select: userFields,
+    });
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} does not exist`);
     }
 
     return user;
-
-    // return this.removePasswordFromUser(user);
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -49,42 +48,41 @@ export class UserService {
     });
   }
 
-  updatePassword(
+  async updatePassword(
     id: string,
     updatePasswordDto: UpdatePasswordDto,
-  ): Partial<User> {
-    const user = this.findOne(id);
+  ): Promise<Partial<User>> {
+    const user = await this.databaseService.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} does not exist`);
+    }
 
     if (user.password !== updatePasswordDto.oldPassword) {
       throw new ForbiddenException('Old password is incorrect.');
     }
 
-    // this.users = this.users.map((user) =>
-    //   user.id === id
-    //     ? {
-    //         ...user,
-    //         password: updatePasswordDto.newPassword,
-    //         updatedAt: Date.now(),
-    //         version: user.version + 1,
-    //       }
-    //     : user,
-    // );
+    const updatedUser = await this.databaseService.user.update({
+      where: { id },
+      data: {
+        password: updatePasswordDto.newPassword,
+        version: user.version + 1,
+      },
+      select: userFields,
+    });
 
-    const updatedUser = this.findOne(id);
-
-    return this.removePasswordFromUser(updatedUser);
+    return updatedUser;
   }
 
-  deleteUser(id: string): void {
-    this.findOne(id);
-
-    this.users = this.users.filter((user) => user.id !== id);
-  }
-
-  private removePasswordFromUser(user: Partial<User>): Partial<User> {
-    const userWithoutPassword = { ...user };
-    delete userWithoutPassword.password;
-
-    return userWithoutPassword;
+  async deleteUser(id: string): Promise<void> {
+    try {
+      await this.databaseService.user.delete({
+        where: { id },
+      });
+    } catch {
+      throw new NotFoundException(`User with ID ${id} does not exist`);
+    }
   }
 }
