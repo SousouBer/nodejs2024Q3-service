@@ -46,7 +46,7 @@ services:
       - '-c'
       - 'logging_collector=on'
       - '-c'
-      - 'log_directory=/var/log/postgres'
+      - 'log_directory=logs'
       - '-c'
       - 'log_statement=all'
     healthcheck:
