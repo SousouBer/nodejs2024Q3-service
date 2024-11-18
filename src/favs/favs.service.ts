@@ -1,14 +1,8 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import { ArtistService } from 'src/artist/artist.service';
 
 import { DatabaseService } from 'src/database/database.service';
-import { Entity } from 'src/enums/entity.enum';
-import { EntityAlreadyInFavoritesException } from 'src/exceptions/already-in-favs.exception';
-import { NotInFavoritesException } from 'src/exceptions/not-in-favs.exception';
 
 import { FavoritesResponse } from 'src/models/favs.model';
-import { AlbumService } from '../album/album.service';
-import { TrackService } from 'src/track/track.service';
 import { Artist } from 'src/models/artist.model';
 import { Album } from 'src/models/album.model';
 import { Track } from 'src/models/track.model';

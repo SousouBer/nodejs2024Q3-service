@@ -3,6 +3,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
@@ -28,7 +29,7 @@ export class FavsController {
   }
 
   @Delete('/track/:id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteTrackFromFavs(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<Track> {
@@ -41,7 +42,7 @@ export class FavsController {
   }
 
   @Delete('/album/:id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteAlbumFromFavs(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<Album> {
@@ -56,7 +57,7 @@ export class FavsController {
   }
 
   @Delete('/artist/:id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteArtistFromFavs(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<Artist> {
