@@ -32,13 +32,7 @@ npm install
 
 # Running application
 
-## When running multi-container app for the first time, run:
-
-```
-docker-compose up --build
-```
-
-## Subsequent commands to run the app:
+## Run the multi-container app:
 
 ```
 docker-compose up
