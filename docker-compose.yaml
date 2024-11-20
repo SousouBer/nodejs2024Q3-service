@@ -8,9 +8,10 @@ networks:
 
 services:
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    image: sousouu/nestjs-home-library-service
     depends_on:
       postgres:
         condition: service_started
