@@ -7,7 +7,13 @@ import { DatabaseModule } from 'src/database/database.module';
 
 @Module({
   controllers: [AuthController],
-  imports: [UserModule, DatabaseModule, JwtModule],
+  imports: [
+    UserModule,
+    DatabaseModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET_KEY,
+    }),
+  ],
   providers: [AuthService],
 })
 export class AuthModule {}

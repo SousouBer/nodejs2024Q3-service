@@ -3,14 +3,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 
 import * as bcrypt from 'bcrypt';
 
 import { CreateUserDto } from 'src/models/create-user.dto';
 import { DatabaseService } from '../database/database.service';
-import { User } from 'src/models/user.model';
 import { AuthPayload, AuthTokens } from './models/tokens.model';
 import { decode } from 'jsonwebtoken';
 import { CreateRefreshTokenDto } from './dto/create-refresh-token.dto';
@@ -18,8 +16,8 @@ import { CreateRefreshTokenDto } from './dto/create-refresh-token.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    private databaseService: DatabaseService,
-    private jwtService: JwtService,
+    private readonly databaseService: DatabaseService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async signup(createUserDto: CreateUserDto) {
