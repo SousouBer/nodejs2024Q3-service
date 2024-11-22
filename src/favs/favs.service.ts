@@ -1,103 +1,126 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { AlbumService } from 'src/album/album.service';
-import { ArtistService } from 'src/artist/artist.service';
-import { FavoritesResponse } from 'src/models/favs.model';
-import { TrackService } from 'src/track/track.service';
-import { NotInFavoritesException } from 'src/exceptions/not-in-favs.exception';
-import { EntityAlreadyInFavoritesException } from 'src/exceptions/already-in-favs.exception';
-import { Track } from 'src/models/track.model';
-import { Album } from 'src/models/album.model';
-import { Artist } from 'src/models/artist.model';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 
-import { Entity } from 'src/enums/entity.enum';
+import { DatabaseService } from 'src/database/database.service';
+
+import { FavoritesResponse } from 'src/models/favs.model';
+import { Artist } from 'src/models/artist.model';
+import { Album } from 'src/models/album.model';
+import { Track } from 'src/models/track.model';
+
+const favsId = '1';
 
 @Injectable()
 export class FavsService {
-  constructor(
-    private albumService: AlbumService,
-    private trackService: TrackService,
-    private artistService: ArtistService,
-  ) {}
+  constructor(private readonly databaseService: DatabaseService) {}
+  async getFavs(): Promise<FavoritesResponse> {
+    const favs = await this.databaseService.favorites.findUnique({
+      where: { id: '1' },
+      select: { artists: true, albums: true, tracks: true },
+    });
 
-  private favourites: FavoritesResponse = {
-    artists: [],
-    albums: [],
-    tracks: [],
-  };
+    if (!favs) {
+      return { artists: [], albums: [], tracks: [] };
+    }
 
-  getFavs(): FavoritesResponse {
-    return this.favourites;
+    return favs;
   }
 
-  addToFavs(id: string, entityIdentifier: 'track' | 'album' | 'artist') {
+  async addArtist(id: string): Promise<Artist> {
     try {
-      let entity: Album | Track | Artist;
-      let favList;
-
-      switch (entityIdentifier) {
-        case Entity.TRACK:
-          entity = this.trackService.getTrack(id);
-          favList = this.favourites.tracks;
-          break;
-        case Entity.ALBUM:
-          entity = this.albumService.getAlbum(id);
-          favList = this.favourites.albums;
-          break;
-        case Entity.ARTIST:
-          entity = this.artistService.getArtist(id);
-          favList = this.favourites.artists;
-          break;
-        default:
-          throw new Error(`Unknown entity type: ${entityIdentifier}`);
-      }
-
-      if (favList.includes(entity)) {
-        throw new EntityAlreadyInFavoritesException(id, entityIdentifier);
-      }
-
-      favList.push(entity);
-
-      return 'Entity added Successfully!';
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotInFavoritesException(id, entityIdentifier);
-      }
-      throw error;
+      return await this.databaseService.artist.update({
+        where: { id },
+        data: {
+          favorites: {
+            connectOrCreate: {
+              where: { id: favsId },
+              create: { id: favsId },
+            },
+          },
+        },
+      });
+    } catch {
+      throw new UnprocessableEntityException("Artist doesn't exist");
     }
   }
 
-  deleteFromFavs(
-    id: string,
-    entityIdentifier: 'track' | 'album' | 'artist',
-  ): void {
-    let entityList;
-
-    switch (entityIdentifier) {
-      case Entity.TRACK:
-        entityList = this.favourites.tracks;
-        break;
-      case Entity.ALBUM:
-        entityList = this.favourites.albums;
-        break;
-      case Entity.ARTIST:
-        entityList = this.favourites.artists;
-        break;
-      default:
-        throw new Error(`Unknown entity type: ${entityIdentifier}`);
+  async deleteArtist(id: string): Promise<Artist> {
+    try {
+      return await this.databaseService.artist.update({
+        where: { id },
+        data: {
+          favorites: {
+            disconnect: { id: favsId },
+          },
+        },
+      });
+    } catch {
+      throw new UnprocessableEntityException("Artist doesn't exist");
     }
+  }
 
-    const entity: Album | Artist | Track = entityList.find(
-      (entity: Album | Artist | Track) => entity.id === id,
-    );
-
-    if (!entity) {
-      throw new NotFoundException(
-        `${entityIdentifier} with ID ${id} is not in the favourites.`,
-      );
+  async addAlbum(id: string): Promise<Album> {
+    try {
+      return await this.databaseService.album.update({
+        where: { id },
+        data: {
+          favorites: {
+            connectOrCreate: {
+              where: { id: favsId },
+              create: { id: favsId },
+            },
+          },
+        },
+      });
+    } catch {
+      throw new UnprocessableEntityException("Album doesn't exist");
     }
+  }
 
-    this.favourites[entityIdentifier + 's'] = entityList.filter(
-      (entity: Album | Artist | Track) => entity.id !== id,
-    );
+  async deleteAlbum(id: string): Promise<Album> {
+    try {
+      return await this.databaseService.album.update({
+        where: { id },
+        data: {
+          favorites: {
+            disconnect: { id: favsId },
+          },
+        },
+      });
+    } catch {
+      throw new UnprocessableEntityException("Album doesn't exist");
+    }
+  }
+
+  async addTrack(id: string): Promise<Track> {
+    try {
+      return await this.databaseService.track.update({
+        where: { id },
+        data: {
+          favorites: {
+            connectOrCreate: {
+              where: { id: favsId },
+              create: { id: favsId },
+            },
+          },
+        },
+      });
+    } catch {
+      throw new UnprocessableEntityException("Track doesn't exist");
+    }
+  }
+
+  async deleteTrack(id: string): Promise<Track> {
+    try {
+      return await this.databaseService.track.update({
+        where: { id },
+        data: {
+          favorites: {
+            disconnect: { id: favsId },
+          },
+        },
+      });
+    } catch {
+      throw new UnprocessableEntityException("Track doesn't exist");
+    }
   }
 }

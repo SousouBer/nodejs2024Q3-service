@@ -2,19 +2,23 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Artist } from 'src/models/artist.model';
 import { CreateArtistDto } from './dto/create-artist.dto';
 
-import { v4 as uuidv4 } from 'uuid';
 import { UpdateArtistDto } from './dto/update-artist.dto';
+import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class ArtistService {
+  constructor(private readonly databaseService: DatabaseService) {}
+
   private artists: Artist[] = [];
 
-  getAllArtists(): Artist[] {
-    return this.artists;
+  async getAllArtists(): Promise<Artist[]> {
+    return await this.databaseService.artist.findMany();
   }
 
-  getArtist(id: string): Artist {
-    const artist = this.artists.find((artist) => artist.id === id);
+  async getArtist(id: string): Promise<Artist> {
+    const artist = await this.databaseService.artist.findUnique({
+      where: { id },
+    });
 
     if (!artist) {
       throw new NotFoundException(`Artist with ID ${id} does not exist`);
@@ -23,31 +27,37 @@ export class ArtistService {
     return artist;
   }
 
-  createArtist(createArtistDto: CreateArtistDto): Artist {
-    const newArtist: Artist = {
-      id: uuidv4(),
-      name: createArtistDto.name,
-      grammy: createArtistDto.grammy,
-    };
-
-    this.artists.push(newArtist);
-
-    return newArtist;
+  async createArtist(createArtistDto: CreateArtistDto): Promise<Artist> {
+    return await this.databaseService.artist.create({
+      data: createArtistDto,
+    });
   }
 
-  updateArtist(id: string, updateArtistDto: UpdateArtistDto): Artist {
-    const artist = this.getArtist(id);
+  async updateArtist(
+    id: string,
+    updateArtistDto: UpdateArtistDto,
+  ): Promise<Artist> {
+    const artist = await this.databaseService.artist.findUnique({
+      where: { id },
+    });
 
-    this.artists = this.artists.map((artist) =>
-      artist.id === id ? { ...artist, ...updateArtistDto } : artist,
-    );
+    if (!artist) {
+      throw new NotFoundException(`Artist with ID ${id} does not exist`);
+    }
 
-    return { ...artist, ...updateArtistDto };
+    return await this.databaseService.artist.update({
+      where: { id },
+      data: updateArtistDto,
+    });
   }
 
-  deleteArtist(id: string): void {
-    this.getArtist(id);
-
-    this.artists = this.artists.filter((artist) => artist.id !== id);
+  async deleteArtist(id: string): Promise<void> {
+    try {
+      await this.databaseService.artist.delete({
+        where: { id },
+      });
+    } catch {
+      throw new NotFoundException(`Artist with ID ${id} does not exist`);
+    }
   }
 }

@@ -4,13 +4,14 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
-import { User } from 'src/models/user.model';
+import { UserWithoutPassword } from 'src/models/user.model';
 import { CreateUserDto } from 'src/models/create-user.dto';
 
 import { ValidationPipe, ParseUUIDPipe } from '@nestjs/common';
@@ -21,19 +22,21 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  findAll(): Partial<User>[] {
-    return this.userService.findAll();
+  getUsers(): Promise<UserWithoutPassword[]> {
+    return this.userService.getUsers();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string): Partial<User> {
-    return this.userService.findOne(id);
+  getUser(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<UserWithoutPassword> {
+    return this.userService.getUser(id);
   }
 
   @Post()
   createUser(
     @Body(ValidationPipe) createUserDto: CreateUserDto,
-  ): Partial<User> {
+  ): Promise<UserWithoutPassword> {
     return this.userService.createUser(createUserDto);
   }
 
@@ -41,13 +44,13 @@ export class UserController {
   updatePassword(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updatePasswordDto: UpdatePasswordDto,
-  ): Partial<User> {
+  ): Promise<UserWithoutPassword> {
     return this.userService.updatePassword(id, updatePasswordDto);
   }
 
   @Delete(':id')
-  @HttpCode(204)
-  removeUser(@Param('id', ParseUUIDPipe) id: string): void {
-    this.userService.deleteUser(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  removeUser(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.userService.deleteUser(id);
   }
 }

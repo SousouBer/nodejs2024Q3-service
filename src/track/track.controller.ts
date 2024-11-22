@@ -2,10 +2,9 @@ import {
   Body,
   Controller,
   Delete,
-  forwardRef,
   Get,
   HttpCode,
-  Inject,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
@@ -16,28 +15,25 @@ import { TrackService } from './track.service';
 import { Track } from 'src/models/track.model';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { CleanupService } from 'src/helpers/cleanup/cleanup.service';
 
 @Controller('track')
 export class TrackController {
-  constructor(
-    private trackService: TrackService,
-    @Inject(forwardRef(() => CleanupService))
-    private readonly cleanupService: CleanupService,
-  ) {}
+  constructor(private trackService: TrackService) {}
 
   @Get()
-  getAllTracks(): Track[] {
+  getAllTracks(): Promise<Track[]> {
     return this.trackService.getAllTracks();
   }
 
   @Get(':id')
-  getTrack(@Param('id', ParseUUIDPipe) id: string): Track {
+  getTrack(@Param('id', ParseUUIDPipe) id: string): Promise<Track> {
     return this.trackService.getTrack(id);
   }
 
   @Post()
-  createTrack(@Body(ValidationPipe) createTrackDto: CreateTrackDto): Track {
+  createTrack(
+    @Body(ValidationPipe) createTrackDto: CreateTrackDto,
+  ): Promise<Track> {
     return this.trackService.createTrack(createTrackDto);
   }
 
@@ -45,15 +41,13 @@ export class TrackController {
   updateTrack(
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updateTrackDto: UpdateTrackDto,
-  ): Track {
+  ): Promise<Track> {
     return this.trackService.updateTrack(id, updateTrackDto);
   }
 
   @Delete(':id')
-  @HttpCode(204)
-  deleteTrack(@Param('id', ParseUUIDPipe) id: string): void {
-    this.trackService.deleteTrack(id);
-
-    this.cleanupService.cleanupTrack(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteTrack(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.trackService.deleteTrack(id);
   }
 }

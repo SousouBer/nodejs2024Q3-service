@@ -3,85 +3,99 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
 
 import { CreateUserDto } from 'src/models/create-user.dto';
-import { User } from 'src/models/user.model';
+import { UserWithoutPassword } from 'src/models/user.model';
 import { UpdatePasswordDto } from 'src/models/update-password.dto';
+import { DatabaseService } from 'src/database/database.service';
+
+const userFields = {
+  id: true,
+  login: true,
+  version: true,
+  createdAt: true,
+  updatedAt: true,
+};
 
 @Injectable()
 export class UserService {
-  private users: User[] = [];
+  constructor(private readonly databaseService: DatabaseService) {}
 
-  findAll(): Partial<User>[] {
-    return this.users.map((user) => {
-      return this.removePasswordFromUser(user);
+  async getUsers(): Promise<UserWithoutPassword[]> {
+    const users = await this.databaseService.user.findMany({
+      select: userFields,
     });
+
+    return users.map((user) => this.convertDateToNumber(user));
   }
 
-  findOne(id: string): Partial<User> {
-    const user = this.users.find((user) => user.id === id);
+  async getUser(id: string): Promise<UserWithoutPassword> {
+    const user = await this.databaseService.user.findUnique({
+      where: {
+        id,
+      },
+      select: userFields,
+    });
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} does not exist`);
     }
 
-    return user;
-
-    // return this.removePasswordFromUser(user);
+    return this.convertDateToNumber(user);
   }
 
-  createUser(createUserDto: CreateUserDto): Partial<User> {
-    const newUser: User = {
-      id: uuidv4(),
-      login: createUserDto.login,
-      version: 1,
-      password: createUserDto.password,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
+  async createUser(createUserDto: CreateUserDto): Promise<UserWithoutPassword> {
+    const createdUser = await this.databaseService.user.create({
+      data: createUserDto,
+      select: userFields,
+    });
 
-    this.users.push(newUser);
-
-    return this.removePasswordFromUser(newUser);
+    return this.convertDateToNumber(createdUser);
   }
 
-  updatePassword(
+  async updatePassword(
     id: string,
     updatePasswordDto: UpdatePasswordDto,
-  ): Partial<User> {
-    const user = this.findOne(id);
+  ): Promise<UserWithoutPassword> {
+    const user = await this.databaseService.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} does not exist`);
+    }
 
     if (user.password !== updatePasswordDto.oldPassword) {
       throw new ForbiddenException('Old password is incorrect.');
     }
 
-    this.users = this.users.map((user) =>
-      user.id === id
-        ? {
-            ...user,
-            password: updatePasswordDto.newPassword,
-            updatedAt: Date.now(),
-            version: user.version + 1,
-          }
-        : user,
-    );
+    const updatedUser = await this.databaseService.user.update({
+      where: { id },
+      data: {
+        password: updatePasswordDto.newPassword,
+        version: user.version + 1,
+      },
+      select: userFields,
+    });
 
-    const updatedUser = this.findOne(id);
-
-    return this.removePasswordFromUser(updatedUser);
+    return this.convertDateToNumber(updatedUser);
   }
 
-  deleteUser(id: string): void {
-    this.findOne(id);
-
-    this.users = this.users.filter((user) => user.id !== id);
+  async deleteUser(id: string): Promise<void> {
+    try {
+      await this.databaseService.user.delete({
+        where: { id },
+      });
+    } catch {
+      throw new NotFoundException(`User with ID ${id} does not exist`);
+    }
   }
 
-  private removePasswordFromUser(user: Partial<User>): Partial<User> {
-    const userWithoutPassword = { ...user };
-    delete userWithoutPassword.password;
-
-    return userWithoutPassword;
+  private convertDateToNumber(user): UserWithoutPassword {
+    return {
+      ...user,
+      createdAt: new Date(user.createdAt).getTime(),
+      updatedAt: new Date(user.updatedAt).getTime(),
+    };
   }
 }

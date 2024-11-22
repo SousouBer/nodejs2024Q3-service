@@ -3,54 +3,64 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
 } from '@nestjs/common';
 import { FavsService } from './favs.service';
 import { FavoritesResponse } from 'src/models/favs.model';
-
-import { Entity } from 'src/enums/entity.enum';
+import { Track } from 'src/models/track.model';
+import { Album } from 'src/models/album.model';
+import { Artist } from 'src/models/artist.model';
 
 @Controller('favs')
 export class FavsController {
   constructor(private favsService: FavsService) {}
 
   @Get()
-  getFavs(): FavoritesResponse {
+  async getFavs(): Promise<FavoritesResponse> {
     return this.favsService.getFavs();
   }
 
   @Post('/track/:id')
-  AddTrackToFavs(@Param('id', ParseUUIDPipe) id: string): string {
-    return this.favsService.addToFavs(id, Entity.TRACK);
+  async AddTrackToFavs(@Param('id', ParseUUIDPipe) id: string): Promise<Track> {
+    return this.favsService.addTrack(id);
   }
 
   @Delete('/track/:id')
-  @HttpCode(204)
-  deleteTrackFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
-    this.favsService.deleteFromFavs(id, Entity.TRACK);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteTrackFromFavs(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<Track> {
+    return this.favsService.deleteTrack(id);
   }
 
   @Post('/album/:id')
-  AddAlbumToFavs(@Param('id', ParseUUIDPipe) id: string): string {
-    return this.favsService.addToFavs(id, Entity.ALBUM);
+  async AddAlbumToFavs(@Param('id', ParseUUIDPipe) id: string): Promise<Album> {
+    return this.favsService.addAlbum(id);
   }
 
   @Delete('/album/:id')
-  @HttpCode(204)
-  deleteAlbumFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
-    this.favsService.deleteFromFavs(id, Entity.ALBUM);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteAlbumFromFavs(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<Album> {
+    return this.favsService.deleteAlbum(id);
   }
 
   @Post('/artist/:id')
-  AddArtistToFavs(@Param('id', ParseUUIDPipe) id: string): string {
-    return this.favsService.addToFavs(id, Entity.ARTIST);
+  async AddArtistToFavs(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<Artist> {
+    return this.favsService.addArtist(id);
   }
 
   @Delete('/artist/:id')
-  @HttpCode(204)
-  deleteArtistFromFavs(@Param('id', ParseUUIDPipe) id: string): void {
-    this.favsService.deleteFromFavs(id, Entity.ARTIST);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteArtistFromFavs(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<Artist> {
+    return this.favsService.deleteArtist(id);
   }
 }
