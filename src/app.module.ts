@@ -14,6 +14,8 @@ import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { LoggingService } from './logging/logging.service';
+import { LoggingModule } from './logging/logging.module';
 
 @Module({
   imports: [
@@ -26,8 +28,9 @@ import { JwtModule } from '@nestjs/jwt';
     DatabaseModule,
     AuthModule,
     JwtModule,
+    LoggingModule,
   ],
   controllers: [AppController, AuthController],
-  providers: [AppService, AuthService],
+  providers: [AppService, AuthService, LoggingService],
 })
 export class AppModule {}
