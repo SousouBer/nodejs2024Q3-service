@@ -1,4 +1,4 @@
-# Home Library Service - Part 2
+# Home Library Service - Part 3
 
 ## Prerequisites
 
@@ -8,7 +8,7 @@
 
 ## Deployed Docker image repo:
 
-- [Follow the link](https://hub.docker.com/repository/docker/sousouu/nestjs-home-library-service)
+- [Follow the link](https://hub.docker.com/repository/docker/sousouu/nestjs-home-library-final)
 
 ## Installing and downloading the app locally
 
@@ -19,7 +19,7 @@ git clone git@github.com:SousouBer/nodejs2024Q3-service.git
 ## Switch to the following remote development branch
 
 ```
-git checkout feat/implement-database-and-docker-functionalities
+git checkout feat/implement-jwt-and-logging
 ```
 
 ## Installing NPM modules/dependencies
@@ -28,7 +28,7 @@ git checkout feat/implement-database-and-docker-functionalities
 npm install
 ```
 
-## Create .env file, and copy .env.example values
+## Create .env file, and copy all .env.example values
 
 # Running application
 
@@ -54,9 +54,13 @@ npm run docker-scan
 
 ## Testing
 
-After running the above command, open a new terminal and enter:
+To run all tests with authorization:
 
-To run all tests without authorization (Which is current week's task)
+```
+npm run test:auth
+```
+
+To run all tests without authorization:
 
 ```
 npm run test
